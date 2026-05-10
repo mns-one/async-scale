@@ -1,5 +1,5 @@
 import asyncio
-from ..simulation.start import JobSimulation
+from src.simulation.start import start_sim
 
 async def process_data(size: int) -> None:
-        asyncio.create_task(JobSimulation.start_sim(size))
+        asyncio.create_task(start_sim(size))
