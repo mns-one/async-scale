@@ -1,39 +1,33 @@
-import asyncio
-from fastapi import APIRouter, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
+
 from . import service
 from .ws_manager import hub
+from .model import SimPayload
+
+from ..simulation.state import State
 
 router = APIRouter(
     prefix = '/app-feature',
     tags=['app_feature']
 )
 
-IS_STARTED = False
 
-@router.get("/data")
-async def get_data(client_id: str, size: int):
-    global IS_STARTED
-
-    if not size:
-        raise HTTPException(
-            status_code=400,
-            detail="Size cant be empty"
-        )
+@router.post("/data")
+async def get_data(payload: SimPayload):
     
-    if(IS_STARTED):
+    if(State.is_started):
         raise HTTPException(
                 status_code=400,
                 detail="Another simulation going on, try again later..."
         )
 
-    if not hub.is_connected(client_id):
+    if not hub.is_connected(payload.client_id):
         raise HTTPException(
                     status_code=400,
                     detail="User not connected to server..."
     )
     
-    IS_STARTED = True
-    await service.process_data(size)
+    await service.process_data(payload)
     return 
 
 @router.websocket("/connect/{client_id}")
@@ -41,8 +35,10 @@ async def stream_socket(ws: WebSocket, client_id: str):
     await hub.connect(client_id, ws)
     try:
         while True:
-            await asyncio.sleep(3600)
+            await ws.receive_text()
     except WebSocketDisconnect:
-        hub.disconnect(client_id)
-    except Exception:
+        print("Disconnecting client {client_id}...")
+    except Exception as e:
+        print(f"Websocket error for {client_id}: {e}")
+    finally:
         hub.disconnect(client_id)
