@@ -1,8 +1,8 @@
 # service.py
-import asyncio
 import json
 from datetime import datetime, timezone
 from fastapi import WebSocket
+from .model import StatsPayload
 
 class StreamHub:
     def __init__(self):
@@ -19,7 +19,7 @@ class StreamHub:
     def disconnect(self, client_id: str):
         self.clients.pop(client_id, None)
 
-    async def broadcast(self, msg: str):
+    async def broadcast(self, msg: StatsPayload):
         self.seq += 1
         packet = {
             "payload": msg,

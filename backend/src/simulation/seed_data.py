@@ -3,7 +3,7 @@ import random
 
 from .state import State
 from .db_utils import create_random_jobs
-
+from ..app_feature.ws_manager import hub
 
 async def data_inflow():
     # seed new data with intervals
@@ -15,7 +15,9 @@ async def data_inflow():
                 State.queued += new_jobs
                 total_jobs = State.queued
             print(f"News jobs arrived -> {new_jobs}, Total jobs -> {total_jobs}")
-            await asyncio.sleep(3)
+            stats = { "new_jobs" : new_jobs }
+            await hub.broadcast(stats)
+            await asyncio.sleep(State.inflow_interval)
     finally:
         # flag to mark end of incoming data   
         async with State.lock: 

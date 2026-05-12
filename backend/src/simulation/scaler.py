@@ -3,9 +3,9 @@ import asyncio
 import math
 from .state import State
 from .worker import start_worker
+from ..app_feature.ws_manager import hub
 
-
-POLL_SECONDS = 1  # interval for scaling process
+POLL_SECONDS = 0.5  # interval for scaling process
 
 async def process_data():
     try:
@@ -52,6 +52,12 @@ async def process_data():
                 f"Total_Jobs={total_jobs} InProcess={in_process} Desired={desired} "
                 f"Workers={alive} Current Throughput={ratio:.2f}%  "
             )
+            stats = {
+                "jobs_to_process": total_jobs,
+                "active_workers": alive,
+                "jobs_done": done
+            }
+            await hub.broadcast(stats)
 
             await asyncio.sleep(POLL_SECONDS)
     finally:
