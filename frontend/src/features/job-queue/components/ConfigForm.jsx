@@ -17,7 +17,7 @@ export function ConfigForm({ clientId, size, interval_, target, onSizeChange, on
       </div>
       <div style={{ ...styles.field, gridColumn: "span 2" }}>
         <label style={styles.label}>
-          Target % <span style={{ opacity: 0.6 }}>(1-90)</span>
+          Target % <span style={{ opacity: 0.6 }}>(10-90)</span>
         </label>
         <input style={styles.input} type="number" min={10} max={90} step={1} value={target} onChange={onTargetChange} />
       </div>
