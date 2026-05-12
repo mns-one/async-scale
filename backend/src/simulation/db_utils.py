@@ -131,16 +131,15 @@ def mark_job_completed(job_id: int, is_success: bool) -> bool:
         
 
 def mark_dependent_jobs_failed(job_id: int) -> int:
-    # mark jobs as failed where depends_on points to the given job_id
+    # mark pending descendant jobs as failed (excluding root job itself)
     db: Session = SessionLocal()
     try:
         sql = text("""
             WITH RECURSIVE descendants AS (
-
-                -- root job
+                -- direct children of root job
                 SELECT j.job_id
                 FROM jobs j
-                WHERE j.job_id = :root_job_id
+                WHERE j.depends_on = :root_job_id
 
                 UNION
 
@@ -158,6 +157,7 @@ def mark_dependent_jobs_failed(job_id: int) -> int:
                 SELECT job_id
                 FROM descendants
             )
+              AND target.status = 'PENDING'
             RETURNING target.job_id;
         """)
 

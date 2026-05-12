@@ -36,7 +36,7 @@ async def start_worker():
                 State.in_process += 1
 
             # simulate job processing delay
-            process_time = random.randint(1, 10)
+            process_time = random.randint(1, 5)
             await asyncio.sleep(process_time)
             
             # decide job success failure using random and update status
@@ -56,7 +56,7 @@ async def start_worker():
             # update job state flags
             async with State.lock:
                 State.in_process -= 1
-                State.queued -= failed_dependents
+                State.queued = max(0, State.queued - failed_dependents)
                 if success:
                     State.jobs_done += 1
 
