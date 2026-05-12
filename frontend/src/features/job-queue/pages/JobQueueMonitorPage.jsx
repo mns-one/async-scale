@@ -62,7 +62,7 @@ export default function JobQueueMonitorPage() {
             style={session.running ? styles.btnStop : styles.btnStart}
             onClick={session.running ? stopSession : session.startSession}
           >
-            {session.running ? "End" : "Start"}
+            {session.running ? "End" : "START"}
           </button>
         </div>
         <div style={styles.simLine}>

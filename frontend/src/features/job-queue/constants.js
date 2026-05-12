@@ -4,8 +4,8 @@ export const BASE_WS = import.meta.env.VITE_BASE_WS || "ws://127.0.0.1:8000";
 export const MAX_PTS = 150;
 
 export const COLORS = {
-  blue: "#378ADD",
-  teal: "#1D9E75",
-  red: "#E24B4A",
+  blue: "#0080ff",
+  teal: "#00a529",
+  red: "#ff0000",
   amber: "#EF9F27",
 };
