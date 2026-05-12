@@ -18,7 +18,7 @@ async def start_worker():
             # scale-down check between jobs
             async with State.lock:
                 if State.stop_tokens > 0:   # check for scale down request
-                    State.stop_tokens -= 1
+                    State.stop_tokens = max(0, State.stop_tokens - 1)
                     break
                 if State.queued <= 0:       # exit if empty queue and no incoming data
                     if not State.data_flow:   
@@ -32,7 +32,7 @@ async def start_worker():
             
             # update job state flags
             async with State.lock:
-                State.queued -= 1
+                State.queued = max(0, State.queued - 1)
                 State.in_process += 1
 
             # simulate job processing delay
@@ -55,7 +55,7 @@ async def start_worker():
 
             # update job state flags
             async with State.lock:
-                State.in_process -= 1
+                State.in_process = max(0, State.in_process - 1)
                 State.queued = max(0, State.queued - failed_dependents)
                 if success:
                     State.jobs_done += 1
@@ -73,5 +73,5 @@ async def start_worker():
     finally:
         # update flag on exit
         async with State.lock:
-            State.workers_alive -= 1
+            State.workers_alive = max(0, State.workers_alive - 1)
        
