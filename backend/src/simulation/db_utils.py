@@ -16,21 +16,26 @@ def create_random_jobs(size: int) -> int:
     created_count = 0
     db: Session = SessionLocal()
     try:
-        # get job_ids from db so dependencies only point to existing jobs
-        existing_ids = [row[0] for row in db.query(Job.job_id).all()]
+        # only allow dependencies on jobs that are not FAILED
+        eligible_ids = [
+            row[0]
+            for row in db.query(Job.job_id)
+            .filter(Job.status != JobStatus.FAILED)
+            .all()
+        ]
 
         for _ in range(size):
             depends_on = None
             # use random to pick existing job dependency
             roll = random.randint(1, 100)
-            if existing_ids and roll % 5 == 0:
-                depends_on = random.choice(existing_ids)
+            if eligible_ids and roll % 5 == 0:
+                depends_on = random.choice(eligible_ids)
 
             job = Job(status=JobStatus.PENDING, depends_on=depends_on)
             db.add(job)
 
             db.flush()
-            existing_ids.append(job.job_id)
+            eligible_ids.append(job.job_id)
             created_count += 1
 
         db.commit()
