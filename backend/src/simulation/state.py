@@ -4,6 +4,7 @@ class State:
 
     lock = asyncio.Lock()
     
+    stop_sim = False
     is_started = False         # simulation running status
     queued = 0                 # pending jobs
     in_process = 0             # currently processing

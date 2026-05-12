@@ -14,7 +14,7 @@ async def start_worker():
     job_id = None    
     
     try:
-        while True:
+        while True and not State.stop_sim:
             # scale-down check between jobs
             async with State.lock:
                 if State.stop_tokens > 0:   # check for scale down request

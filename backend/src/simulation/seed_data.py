@@ -12,6 +12,8 @@ async def data_inflow():
             roll = random.randint(1, State.inflow_size)
             new_jobs = create_random_jobs(roll)
             async with State.lock:
+                if State.stop_sim:
+                    break
                 State.queued += new_jobs
                 total_jobs = State.queued
             print(f"News jobs arrived -> {new_jobs}, Total jobs -> {total_jobs}")

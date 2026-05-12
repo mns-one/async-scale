@@ -5,6 +5,7 @@ from .ws_manager import hub
 from .model import SimPayload
 
 from ..simulation.state import State
+from ..simulation.sim_utils import stop_sim_task
 
 router = APIRouter(
     prefix = '/app-feature',
@@ -41,4 +42,5 @@ async def stream_socket(ws: WebSocket, client_id: str):
     except Exception as e:
         print(f"Websocket error for {client_id}: {e}")
     finally:
+        await stop_sim_task();
         hub.disconnect(client_id)

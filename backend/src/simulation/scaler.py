@@ -10,7 +10,7 @@ POLL_SECONDS = 0.5  # interval for scaling process
 async def process_data():
     try:
         # keep process alive until incoming data or jobs left
-        while State.data_flow or State.queued > 0 or State.in_process > 0:
+        while (State.data_flow or State.queued > 0 or State.in_process > 0) and not State.stop_sim:
             
             # take snapshot of current flags
             async with State.lock:
@@ -61,8 +61,21 @@ async def process_data():
 
             await asyncio.sleep(POLL_SECONDS)
     finally:
-        # mark end of simulation
-        State.is_started = False
+        # send final data packet on exit
+        async with State.lock:
+                queued = State.queued
+                in_process = State.in_process
+                alive = State.workers_alive
+                done = State.jobs_done
+
+        stats = {
+                "jobs_to_process": queued + in_process,
+                "active_workers": alive,
+                "jobs_done": done
+        }    
+
+        await hub.broadcast(stats)    
+
 
     
 

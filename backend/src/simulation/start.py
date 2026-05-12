@@ -11,6 +11,7 @@ from .db_utils import clear_jobs
 async def start_sim(sim_data: SimPayload):
     clear_jobs()    # clear jobs table before starting
 
+    State.stop_sim = False
     State.is_started = True
     State.queued = 0
     State.in_process = 0
