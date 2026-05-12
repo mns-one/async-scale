@@ -12,6 +12,7 @@ class StreamHub:
     async def connect(self, client_id: str, ws: WebSocket):
         await ws.accept()
         self.clients[client_id] = ws
+        self.seq = 0
     
     def is_connected(self, client_id: str):   
         return client_id in self.clients
